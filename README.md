@@ -1,4 +1,4 @@
-#PostMS
+# PostMS
 
 PostMS is a Go microservice exposing a RESTful API for managing blog-like posts and comments in a PostgreSQL database.
 
