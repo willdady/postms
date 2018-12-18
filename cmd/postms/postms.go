@@ -65,6 +65,9 @@ var resources = rest.ResourceMap{
 		"update": handlers.UpdatePostComment,
 		"detail": handlers.GetPostComment,
 	},
+	"tags": rest.ActionMap{
+		"list": handlers.GetTags,
+	},
 }
 
 func main() {

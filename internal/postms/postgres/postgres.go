@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 	"github.com/willdady/postms/internal/errors"
 	"github.com/willdady/postms/internal/postms/models"
 	"github.com/willdady/postms/internal/utils"
@@ -43,7 +44,7 @@ func (service *PostService) GetPost(postID uint64) (models.Post, error) {
 	return p, nil
 }
 
-func (service *PostService) GetPosts(cursor string, userID string) ([]models.Post, string, error) {
+func (service *PostService) GetPosts(cursor string, userID string, tag string) ([]models.Post, string, error) {
 	posts := []models.Post{}
 	query := service.DB.Order("id desc")
 	if cursor != "" {
@@ -55,6 +56,9 @@ func (service *PostService) GetPosts(cursor string, userID string) ([]models.Pos
 	}
 	if userID != "" {
 		query = query.Where("user_id = ?", userID)
+	}
+	if tag != "" {
+		query = query.Where("? = ANY(tags)", tag)
 	}
 	// Note we over-fetch by 1 so we can check if there are more items
 	limit := 101
@@ -170,4 +174,10 @@ func (service *PostService) DeletePostSave(postSave *models.PostSave) error {
 	}
 	service.DB.Delete(postSave)
 	return nil
+}
+
+func (service *PostService) GetTags() ([]string, error) {
+	tags := pq.StringArray{}
+	service.DB.Raw("SELECT array_agg(DISTINCT flattags) FROM posts, unnest(tags) as flattags").Row().Scan(&tags)
+	return tags, nil
 }

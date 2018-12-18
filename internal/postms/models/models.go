@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/gosimple/slug"
+	"github.com/lib/pq"
+	"github.com/willdady/postms/internal/utils"
 )
 
 type CommonFields struct {
@@ -15,24 +17,28 @@ type CommonFields struct {
 
 type Post struct {
 	CommonFields
-	UserID string `json:"userId" binding:"required"`
-	Title  string `json:"title" binding:"required"`
-	Slug   string `json:"slug"`
-	Body   string `json:"body" binding:"required"`
+	UserID string         `json:"userId" binding:"required"`
+	Title  string         `json:"title" binding:"required"`
+	Slug   string         `json:"slug"`
+	Body   string         `json:"body" binding:"required"`
+	Tags   pq.StringArray `json:"tags" gorm:"type:varchar(64)[]"`
 }
 
 func (p *Post) BeforeCreate() (err error) {
 	p.Slug = slug.Make(p.Title)
+	p.Tags = utils.ToTagSlice(p.Tags)
 	return
 }
 
 func (p *Post) BeforeSave() (err error) {
 	p.Slug = slug.Make(p.Title)
+	p.Tags = utils.ToTagSlice(p.Tags)
 	return
 }
 
 func (p *Post) BeforeUpdate() (err error) {
 	p.Slug = slug.Make(p.Title)
+	p.Tags = utils.ToTagSlice(p.Tags)
 	return
 }
 

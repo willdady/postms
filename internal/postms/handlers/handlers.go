@@ -161,7 +161,8 @@ func GetPosts(c *gin.Context) {
 	postService := getPostServiceFromContext(c)
 	cursor := c.Query("cursor")
 	userID := c.Query("userId")
-	posts, nextCursor, err := postService.GetPosts(cursor, userID)
+	tag := c.Query("tag")
+	posts, nextCursor, err := postService.GetPosts(cursor, userID, tag)
 	if err != nil {
 		handleServiceError(err, c)
 		return
@@ -299,4 +300,14 @@ func DeletePostSave(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, gin.H{})
+}
+
+func GetTags(c *gin.Context) {
+	postService := getPostServiceFromContext(c)
+	tags, err := postService.GetTags()
+	if err != nil {
+		handleServiceError(err, c)
+		return
+	}
+	c.JSON(http.StatusOK, tags)
 }

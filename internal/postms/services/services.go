@@ -9,7 +9,7 @@ type PostService interface {
 	UpdatePost(post *models.Post) error
 	DeletePost(post *models.Post) error
 	GetPost(postID uint64) (models.Post, error)
-	GetPosts(cursor string, userID string) ([]models.Post, string, error)
+	GetPosts(cursor string, userID string, tag string) ([]models.Post, string, error)
 	CreatePostComment(postComment *models.PostComment) error
 	UpdatePostComment(postComment *models.PostComment) error
 	DeletePostComment(postComment *models.PostComment) error
@@ -23,4 +23,5 @@ type PostService interface {
 	GetPostSave(postSaveID uint64) (models.PostSave, error)
 	GetPostSaves(postID uint64, userID string) ([]models.PostSave, error)
 	DeletePostSave(postSave *models.PostSave) error
+	GetTags() ([]string, error)
 }
