@@ -68,12 +68,14 @@ func UpdatePost(c *gin.Context) {
 			gin.H{"status": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
-	_, err = postService.GetPost(postID)
+	var existingPost models.Post
+	existingPost, err = postService.GetPost(postID)
 	if err != nil {
 		handleServiceError(err, c)
 		return
 	}
 	post.ID = uint(postID)
+	post.CreatedAt = existingPost.CreatedAt
 	err = postService.UpdatePost(post)
 	if err != nil {
 		handleServiceError(err, c)
