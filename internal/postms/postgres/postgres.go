@@ -44,6 +44,16 @@ func (service *PostService) GetPost(postID uint64) (models.Post, error) {
 	return p, nil
 }
 
+func (service *PostService) PostExists(postID uint64) (bool, error) {
+	result := struct {
+		Exists bool
+	}{}
+	if err := service.DB.Raw("SELECT EXISTS(SELECT 1 FROM posts WHERE id=?) as exists", postID).Scan(&result).Error; err != nil {
+		return false, err
+	}
+	return result.Exists, nil
+}
+
 func (service *PostService) GetPosts(cursor string, userID string, tag string) ([]models.Post, string, error) {
 	posts := []models.Post{}
 	query := service.DB.Order("id desc")

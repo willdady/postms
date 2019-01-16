@@ -226,8 +226,26 @@ func CreatePostVote(c *gin.Context) {
 	} else if postVote.Value < 0 {
 		postVote.Value = -1
 	}
-	// TODO: Check if post exists
-	// TODO: Check if post vote exists, if it does just return the existing one
+	// Check the post actually exists
+	postExists, err := postService.PostExists(uint64(postVote.PostID))
+	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		return
+	}
+	if !postExists {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"status": http.StatusBadRequest, "message": "Post matching id does not exist"})
+		return
+	}
+	// If a vote already exists, return it
+	existingPostVote, _ := postService.GetPostVote(uint64(postVote.PostID), postVote.UserID)
+	if existingPostVote.UserID != "" {
+		c.JSON(http.StatusOK, existingPostVote)
+		return
+	}
 	err = postService.CreatePostVote(postVote)
 	if err != nil {
 		handleServiceError(err, c)
@@ -260,7 +278,20 @@ func CreatePostSave(c *gin.Context) {
 			gin.H{"status": http.StatusBadRequest, "message": err.Error()})
 		return
 	}
-	// TODO: Check a Post matching submitted id exists
+	// Check the post actually exists
+	postExists, err := postService.PostExists(uint64(postSave.PostID))
+	if err != nil {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"status": http.StatusBadRequest, "message": err.Error()})
+		return
+	}
+	if !postExists {
+		c.AbortWithStatusJSON(
+			http.StatusBadRequest,
+			gin.H{"status": http.StatusBadRequest, "message": "Post matching id does not exist"})
+		return
+	}
 	var isNew bool
 	postSave, isNew, err = postService.CreatePostSave(&postSave)
 	if err != nil {

@@ -9,6 +9,7 @@ type PostService interface {
 	UpdatePost(post *models.Post) error
 	DeletePost(post *models.Post) error
 	GetPost(postID uint64) (models.Post, error)
+	PostExists(postID uint64) (bool, error)
 	GetPosts(cursor string, userID string, tag string) ([]models.Post, string, error)
 	CreatePostComment(postComment *models.PostComment) error
 	UpdatePostComment(postComment *models.PostComment) error
